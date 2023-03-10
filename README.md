@@ -43,7 +43,7 @@ steps:
 - name: Terraform Apply
   env:
     project: 'smart-contracts'
-    project_git_url: 'https://github.com/${{github.repository}}.git"
+    project_git_url: 'https://github.com/${{github.repository}}.git'
     project_git_checkout: ${{ github.head_ref || github.ref_name }}
     ec2_instance_key_name: 'key.pem'
     run_tests_cmd: 'yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml'
