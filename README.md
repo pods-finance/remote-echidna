@@ -49,7 +49,7 @@ steps:
     run_tests_cmd: 'yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml'
   run: |
     terraform init
-    terraform apply -var="ec2_instance_key_name=${{ env.ec2_instance_key_name }}" -var="project=${{ env.project }}" -var="project_git_url=${{ env.project_git_url }}" -var="project_git_checkout=${{ env.project_git_checkout }}" -var="run_tests_cmd=${{ var.run_tests_cmd }}" -no-color -input=false -auto-apply
+    terraform apply -var="ec2_instance_key_name=${{ env.ec2_instance_key_name }}" -var="project=${{ env.project }}" -var="project_git_url=${{ env.project_git_url }}" -var="project_git_checkout=${{ env.project_git_checkout }}" -var="run_tests_cmd=${{ env.run_tests_cmd }}" -no-color -input=false -auto-apply
 ```
 
 ## Development
