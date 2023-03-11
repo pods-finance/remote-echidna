@@ -48,8 +48,8 @@ sudo mv echidna-test /usr/bin/
 
 echo "[${namespace}][${project}][$(date)] Install git project"
 git clone ${project_git_url} 
-cd "$(basename ${project_git_url} .git)"
-git checkout ${project_git_checkout}
+# cd "$(basename ${project_git_url} .git)"
+# git checkout ${project_git_checkout}
 
 echo "[${namespace}][${project}][$(date)] Load previous output from S3"
 aws s3 sync s3://${s3_bucket}/${namespace}-${project}/${project_git_checkout}/ $ECHIDNA_DIRECTORY/ 
