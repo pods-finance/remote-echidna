@@ -22,7 +22,7 @@ git submodule add https://github.com/aviggiano/remote-echidna.git
 
 2. Create a [Workspace](https://app.terraform.io/app/YOUR_ORG/workspaces/new) with `Version control workflow` on Terraform Cloud and link your Github project
 
-3. Add the input variables below to your [Workspace variables](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/variables) on Terraform Cloud
+3. Add the the parameters below to your [Workspace variables](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/variables) on Terraform Cloud, including `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` as environment variables
 
 4. Configure your [Working Directory](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/settings/general) as `remote-echidna`
 
