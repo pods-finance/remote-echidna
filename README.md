@@ -12,14 +12,21 @@ This project creates the following infrastructure on AWS:
 - [IAM User](./terraform/iam_user.tf) with the created IAM Policy
 - [EC2 Instance](./terraform/ec2_instance.tf) that runs echidna on the desired git project and uses the IAM User credentials to upload results to S3
 
-## Usage on GitHub Actions
+## Usage with Terraform Cloud
 
-1. Add this project as a dependency of the repository you want to test. For example, if you are using hardhat:
+1. Add this project as a dependency of the repository you want to test. The easiest way is with a git module
 
-- In case of using Hardhat, use: `npm install https://github.com/aviggiano/remote-echidna.git` or `yarn add https://github.com/aviggiano/remote-echidna.git`
-- In case of using Foundry, use: `forge install aviggiano/remote-echidna`
+```
+git submodule add https://github.com/aviggiano/remote-echidna.git
+```
 
-2. Add the [hashicorp/setup-terraform](https://github.com/hashicorp/setup-terraform) GitHub action to your CI and configure the specific input parameters below
+2. Create a [Workspace](https://app.terraform.io/app/YOUR_ORG/workspaces/new) with `Version control workflow` on Terraform Cloud and link your Github project
+
+3. Add the input variables below to your [Workspace variables](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/variables) on Terraform Cloud
+
+4. Configure your [Working Directory](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/settings/general) as `remote-echidna`
+
+5. Set `Include submodules on clone` on the [Version Control](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/settings/version-control) settings
 
 ### Inputs
 
@@ -78,5 +85,4 @@ terraform apply -var-file vars.tfvars
 
 - [ ] Improve state management to avoid conflicting runs from multiple people
 - [ ] Perform cleanup of terraform state after the job finishes
-- [ ] Integrate with Terraform Cloud
 - [ ] Create AMI with all required software instead of [installing everything](./terraform/user_data.tftpl) at each time (would speed up about 1min)
