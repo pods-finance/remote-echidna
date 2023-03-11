@@ -22,23 +22,19 @@ resource "aws_instance" "ec2_instance" {
   vpc_security_group_ids = [aws_security_group.security_group.id]
 
   tags = {
-    Name = "${var.namespace}-${var.project}-${data.external.git_branch.result.branch}"
+    Name = "${var.namespace}-${var.project}-${var.TFC_CONFIGURATION_VERSION_GIT_BRANCH}"
   }
 
   key_name = var.ec2_instance_key_name
   user_data = templatefile("user_data.tftpl", {
-    namespace        = var.namespace,
-    project          = var.project,
-    s3_bucket        = aws_s3_bucket.s3_bucket.id,
-    solidity_version = var.solidity_version,
-    project_git_url  = var.project_git_url,
-    # project_git_checkout  = data.external.git_branch.result.branch,
+    namespace             = var.namespace,
+    project               = var.project,
+    s3_bucket             = aws_s3_bucket.s3_bucket.id,
+    solidity_version      = var.solidity_version,
+    project_git_url       = var.project_git_url,
+    project_git_checkout  = var.TFC_CONFIGURATION_VERSION_GIT_BRANCH,
     run_tests_cmd         = var.run_tests_cmd,
     aws_access_key_id     = aws_iam_access_key.iam_user_access_key.id,
     aws_secret_access_key = aws_iam_access_key.iam_user_access_key.secret,
   })
 }
-
-# data "external" "git_branch" {
-#   program = ["/bin/bash", "-c", "jq -n --arg branch `git rev-parse --abbrev-ref HEAD` '{\"branch\":$branch}'"]
-# }

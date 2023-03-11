@@ -41,3 +41,10 @@ variable "run_tests_cmd" {
   type        = string
   description = "Command to run echidna tests"
 }
+
+# https://stackoverflow.com/questions/66598788/terraform-how-can-i-reference-terraform-cloud-environmental-variables
+variable "TFC_CONFIGURATION_VERSION_GIT_BRANCH" {
+  type        = string
+  description = "Terraform Cloud git branch"
+  default     = ""
+}
