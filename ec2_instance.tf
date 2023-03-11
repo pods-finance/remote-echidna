@@ -30,7 +30,7 @@ resource "aws_instance" "ec2_instance" {
   user_data = templatefile("user_data.tftpl", {
     namespace             = var.namespace,
     project               = var.project,
-    s3_bucket             = aws_s3_bucket.s3_bucket.id,
+    s3_bucket             = data.aws_s3_bucket.s3_bucket.id,
     solidity_version      = var.solidity_version,
     project_git_url       = var.project_git_url,
     project_git_checkout  = var.project_git_checkout,

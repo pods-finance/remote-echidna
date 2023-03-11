@@ -15,6 +15,11 @@ variable "project" {
   description = "Your project name"
 }
 
+variable "s3_bucket" {
+  type        = string
+  description = "S3 Bucket name to store and load echidna's output between runs"
+}
+
 variable "instance_type" {
   type        = string
   description = "Instance type to run echidna on"
