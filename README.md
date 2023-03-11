@@ -35,7 +35,6 @@ git submodule add https://github.com/aviggiano/remote-echidna.git
 | `ec2_instance_key_name` | EC2 instance key name. Needs to be manually created first on the AWS console | `key.pem`                                                                              | Yes      |
 | `project`               | Your project name                                                            | `smart-contracts`                                                                      | Yes      |
 | `project_git_url`       | Project Git URL                                                              | `https://github.com/aviggiano/smart-contracts.git`                                     | Yes      |
-| `project_git_checkout`  | Project Git checkout (branch or commit hash)                                 | `main`                                                                                 | Yes      |
 | `run_tests_cmd`         | Command to run echidna tests                                                 | `yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml` | Yes      |
 
 ## Development
@@ -49,7 +48,6 @@ Include the parameters required by [vars.tf](./terraform/vars.tf)
 
 project               = "echidna-project"
 project_git_url       = "https://github.com/aviggiano/echidna-project.git"
-project_git_checkout  = "main"
 ec2_instance_key_name = "key.pem"
 run_tests_cmd         = "yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml"
 ```

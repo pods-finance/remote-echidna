@@ -17,13 +17,12 @@ data "aws_ami" "ubuntu" {
 
 
 resource "aws_instance" "ec2_instance" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = var.instance_type
-  vpc_security_group_ids      = [aws_security_group.security_group.id]
-  user_data_replace_on_change = true
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  vpc_security_group_ids = [aws_security_group.security_group.id]
 
   tags = {
-    Name = "${var.namespace}-${var.project}-instance"
+    Name = "${var.namespace}-${var.project}-${data.external.git_branch.result.branch}"
   }
 
   key_name = var.ec2_instance_key_name
