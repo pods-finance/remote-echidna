@@ -38,27 +38,6 @@ git submodule add https://github.com/aviggiano/remote-echidna.git
 | `project_git_checkout`  | Project Git checkout (branch or commit hash)                                 | `main`                                                                                 | Yes      |
 | `run_tests_cmd`         | Command to run echidna tests                                                 | `yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml` | Yes      |
 
-### Example usage
-
-```
-steps:
-- uses: hashicorp/setup-terraform@v2
-  with:
-    cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-- name: Terraform Init
-  run: terraform init
-- name: Terraform Apply
-  env:
-    project: 'smart-contracts'
-    project_git_url: 'https://github.com/${{github.repository}}.git'
-    project_git_checkout: ${{ github.head_ref || github.ref_name }}
-    ec2_instance_key_name: 'key.pem'
-    run_tests_cmd: 'yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml'
-  run: |
-    terraform init
-    terraform apply -var="ec2_instance_key_name=${{ env.ec2_instance_key_name }}" -var="project=${{ env.project }}" -var="project_git_url=${{ env.project_git_url }}" -var="project_git_checkout=${{ env.project_git_checkout }}" -var="run_tests_cmd=${{ env.run_tests_cmd }}" -no-color -input=false -auto-apply
-```
-
 ## Development
 
 #### 1. Create a `tfvars` file

@@ -37,11 +37,6 @@ variable "project_git_url" {
   description = "Project Git URL"
 }
 
-variable "project_git_checkout" {
-  type        = string
-  description = "Project Git checkout (branch or commit hash)"
-}
-
 variable "run_tests_cmd" {
   type        = string
   description = "Command to run echidna tests"
