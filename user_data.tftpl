@@ -7,6 +7,7 @@ echo "[${namespace}][${project}][$(date)] Start tests"
 echo "[${namespace}][${project}][$(date)] Setup environment variables"
 export AWS_ACCESS_KEY_ID=${aws_access_key_id}
 export AWS_SECRET_ACCESS_KEY=${aws_secret_access_key}
+export INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
 export WORKDIR=/home/ubuntu
 export ECHIDNA_DIRECTORY=echidna
 
@@ -23,10 +24,9 @@ unzip awscliv2.zip
 sudo ./aws/install
 
 echo "[${namespace}][${project}][$(date)] Update job status"
-INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > STARTED.yml
-aws s3 mv STARTED.yml s3://${s3_bucket}/${project_git_checkout}/${INSTANCE_ID}/status/
+aws s3 mv STARTED.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
 
 echo "[${namespace}][${project}][$(date)] Install Node.js"
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
@@ -62,19 +62,19 @@ aws s3 sync s3://${s3_bucket}/${project_git_checkout}/output/ $ECHIDNA_DIRECTORY
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > RUNNING.yml
-aws s3 mv RUNNING.yml s3://${s3_bucket}/${project_git_checkout}/${INSTANCE_ID}/status/
+aws s3 mv RUNNING.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
 
 echo "[${namespace}][${project}][$(date)] Run tests"
 echo "[${namespace}][${project}][$(date)] '${run_tests_cmd}'"
 ${run_tests_cmd}
 
 echo "[${namespace}][${project}][$(date)] Copy output to S3"
-aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/${project_git_checkout}/${INSTANCE_ID}/
+aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/
 aws s3 sync $ECHIDNA_DIRECTORY/ s3://${s3_bucket}/${project_git_checkout}/output/
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > FINISHED.yml
-aws s3 mv FINISHED.yml s3://${s3_bucket}/${project_git_checkout}/${INSTANCE_ID}/status/
+aws s3 mv FINISHED.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
 
 echo "[${namespace}][${project}][$(date)] Finish tests"
 
