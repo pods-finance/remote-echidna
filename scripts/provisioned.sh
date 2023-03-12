@@ -7,7 +7,7 @@ PROJECT_GIT_CHECKOUT="$2"
 INSTANCE_ID="$3"
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-echo "date: $DATE" > PROVISIONED.yml
-aws s3 cp PROVISIONED.yml s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/$INSTANCE_ID/status/
-aws s3 cp PROVISIONED.yml s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/latest/status/
+echo "date: $DATE" > 1_PROVISIONED.yml
+aws s3 cp 1_PROVISIONED.yml s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/$INSTANCE_ID/status/
+aws s3 cp 1_PROVISIONED.yml s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/latest/status/
 aws s3 cp terraform.tfstate s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/
