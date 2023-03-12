@@ -18,9 +18,10 @@ Some of these states are managed from within the instance (2 -> 3 -> 4), while o
 
 ## Setup
 
-Manual setup:
+Manual steps:
 
-- [S3 bucket](./terraform/s3_bucket.tf) with private access to store and load echidna's output between runs
+1. Create a [S3 bucket](./terraform/s3_bucket.tf) with private access to store and load echidna's output between runs
+2. Create a [private key](./terraform/ec2_instance.tf) used to connect to the remote instance and download it to your local machine
 
 This project creates the following infrastructure on AWS:
 
