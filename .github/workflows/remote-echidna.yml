@@ -12,12 +12,6 @@ on:
       project_git_checkout:
         required: true
         type: string
-      s3_bucket:
-        required: true
-        type: string
-      ec2_instance_key_name:
-        required: true
-        type: string
       run_tests_cmd:
         required: true
         type: string
@@ -27,6 +21,10 @@ on:
       AWS_SECRET_ACCESS_KEY:
         required: true
       AWS_REGION:
+        required: true
+      REMOTE_ECHIDNA_S3_BUCKET:
+        required: true
+      REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME:
         required: true
 
 
@@ -56,11 +54,11 @@ jobs:
           echo 'project = "${{ inputs.project }}"' >> ${{ inputs.project }}.tfvars
           echo 'project_git_url = "${{ inputs.project_git_url }}"' >> ${{ inputs.project }}.tfvars
           echo 'project_git_checkout = "${{ inputs.project_git_checkout }}"' >> ${{ inputs.project }}.tfvars
-          echo 's3_bucket = "${{ inputs.s3_bucket }}"' >> ${{ inputs.project }}.tfvars
-          echo 'ec2_instance_key_name = "${{ inputs.ec2_instance_key_name }}"' >> ${{ inputs.project }}.tfvars
+          echo 's3_bucket = "${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}"' >> ${{ inputs.project }}.tfvars
+          echo 'ec2_instance_key_name = "${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}"' >> ${{ inputs.project }}.tfvars
           echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> ${{ inputs.project }}.tfvars
       - name: Provision
-        run: ./scripts/provision.sh ${{ inputs.s3_bucket }} ${{ inputs.project_git_checkout }}
+        run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
       - name: Destroy previous instance
         run: |
           terraform init
@@ -73,5 +71,5 @@ jobs:
           EC2_INSTANCE_ID=$(terraform output ec2_instance_id)
           echo "EC2_INSTANCE_ID=${EC2_INSTANCE_ID}" >> $GITHUB_OUTPUT
       - name: Provisioned
-        run: ./scripts/provisioned.sh ${{ inputs.s3_bucket }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }}
+        run: ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }}
 
