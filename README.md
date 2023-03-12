@@ -4,6 +4,20 @@ Run echidna on AWS with Terraform
 
 ## Description
 
+This project creates an instance, together with other AWS resources, for each echidna job. The instance starts up, install all required components, runs the fuzz tests, and automatically shuts down itself afterwards.
+
+In order to guarantee that all provisioned resources are deleted after the job, the job state is stored on a S3 bucket. A job can go through some stages:
+
+1. Provisioned
+2. Started
+3. Running
+4. Finished
+5. Deprovisioned
+
+Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (1 -> 2, 4 -> 5).
+
+## Setup
+
 Manual setup:
 
 - [S3 bucket](./terraform/s3_bucket.tf) with private access to store and load echidna's output between runs
@@ -56,7 +70,7 @@ steps:
     project: 'smart-contracts'
     project_git_url: 'https://github.com/${{github.repository}}.git'
     project_git_checkout: ${{ github.head_ref || github.ref_name }}
-    s3_bucket: 'remote-echidna
+    s3_bucket: 'remote-echidna'
     ec2_instance_key_name: 'key.pem'
     run_tests_cmd: 'yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml'
   run: |
