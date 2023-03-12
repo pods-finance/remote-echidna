@@ -16,6 +16,8 @@ In order to guarantee that all provisioned resources are deleted after the job, 
 
 Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (1 -> 2, 4 -> 5).
 
+**Note:** Currently the state `Deprovisioned` is not implemented. The current infrastructure will still exist until the next run. The only thing that is shut down is the EC2 Instance.
+
 ## Setup
 
 Manual steps:
