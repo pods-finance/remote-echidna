@@ -22,10 +22,6 @@ on:
         required: true
         type: string
     secrets:
-      REMOTE_ECHIDNA_S3_BUCKET:
-        required: true
-      REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME:
-        required: true
       AWS_ACCESS_KEY_ID:
         required: true
       AWS_SECRET_ACCESS_KEY:
