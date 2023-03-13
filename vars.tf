@@ -1,5 +1,5 @@
 locals {
-  prefix = "${var.namespace}-${var.project}-${substr(sha256(var.project_git_checkout), 0, 6)}-instance"
+  prefix = "${var.namespace}-${var.project}-${substr(sha256(var.project_git_checkout), 0, 6)}"
 }
 
 
