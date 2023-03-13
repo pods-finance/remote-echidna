@@ -39,7 +39,7 @@ on:
 jobs:
   remote-echidna:
     name: Run remote-echidna
-    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@main
+    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@v1
     with:
       project: "remote-echidna-demo"
       project_git_url: "https://github.com/${{github.repository}}.git"
