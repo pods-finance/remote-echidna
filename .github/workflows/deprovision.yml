@@ -2,10 +2,6 @@ name: Deprovision
 
 on:
   workflow_call:
-    inputs:
-      project:
-        required: true
-        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
