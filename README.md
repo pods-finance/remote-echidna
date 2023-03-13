@@ -89,3 +89,4 @@ aws s3 cp s3://$REMOTE_ECHIDNA_S3_BUCKET/${project_git_checkout}/latest/cloud-in
 - [ ] Create a better way to visualize echidna output
 - [ ] Create a better way to monitor echidna ETA (depends on [crytic/echidna#975](https://github.com/crytic/echidna/issues/975))
 - [ ] Create AMI with all required software instead of [installing everything](./terraform/user_data.tftpl) at each time (would speed up about 1min)
+- [ ] Verify best instance for the job
