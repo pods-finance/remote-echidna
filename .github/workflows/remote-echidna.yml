@@ -49,12 +49,15 @@ jobs:
       - name: Create tfvars file
         working-directory: ./remote-echidna
         run: |
-          echo 'project = "${{ inputs.project }}"' >> ${{ inputs.project }}.tfvars
-          echo 'project_git_url = "${{ inputs.project_git_url }}"' >> ${{ inputs.project }}.tfvars
-          echo 'project_git_checkout = "${{ inputs.project_git_checkout }}"' >> ${{ inputs.project }}.tfvars
-          echo 's3_bucket = "${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}"' >> ${{ inputs.project }}.tfvars
-          echo 'ec2_instance_key_name = "${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}"' >> ${{ inputs.project }}.tfvars
-          echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> ${{ inputs.project }}.tfvars
+          echo 'project = "${{ inputs.project }}"' > vars.tfvars
+          echo 'project_git_url = "${{ inputs.project_git_url }}"' >> vars.tfvars
+          echo 'project_git_checkout = "${{ inputs.project_git_checkout }}"' >> vars.tfvars
+          echo 's3_bucket = "${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}"' >> vars.tfvars
+          echo 'ec2_instance_key_name = "${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}"' >> vars.tfvars
+          echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> vars.tfvars
+      - name: Deprovision old jobs
+        working-directory: ./remote-echidna
+        run: ./scripts/deprovision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
       - name: Provision
         working-directory: ./remote-echidna
         run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
@@ -67,13 +70,13 @@ jobs:
         working-directory: ./remote-echidna
         run: |
           terraform init
-          terraform destroy -target aws_instance.ec2_instance -var-file ${{ inputs.project }}.tfvars -no-color -input=false -auto-approve
+          terraform destroy -target aws_instance.ec2_instance -var-file vars.tfvars -no-color -input=false -auto-approve
       - name: Terraform Apply
         id: apply
         working-directory: ./remote-echidna
         run: |
           terraform init
-          terraform apply -var-file ${{ inputs.project }}.tfvars -no-color -input=false -auto-approve
+          terraform apply -var-file vars.tfvars -no-color -input=false -auto-approve
           EC2_INSTANCE_ID=$(terraform output ec2_instance_id)
           echo "EC2_INSTANCE_ID=${EC2_INSTANCE_ID}" >> $GITHUB_OUTPUT
       - name: Provisioned

@@ -24,8 +24,12 @@ unzip awscliv2.zip
 sudo ./aws/install
 
 echo "[${namespace}][${project}][$(date)] Update job status"
+
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > 2_STARTED.yml
+echo "project_git_checkout: ${project_git_checkout}" >> 2_STARTED.yml
+echo "instance_id: $INSTANCE_ID" >> 2_STARTED.yml
+
 aws s3 cp 2_STARTED.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
 aws s3 cp 2_STARTED.yml s3://${s3_bucket}/${project_git_checkout}/latest/status/
 
@@ -63,6 +67,9 @@ aws s3 sync s3://${s3_bucket}/${project_git_checkout}/output/ $ECHIDNA_DIRECTORY
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > 3_RUNNING.yml
+echo "project_git_checkout: ${project_git_checkout}" >> 3_RUNNING.yml
+echo "instance_id: $INSTANCE_ID" > 3_RUNNING.yml
+
 aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
 aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/${project_git_checkout}/latest/status/
 
@@ -77,8 +84,12 @@ aws s3 sync $ECHIDNA_DIRECTORY/ s3://${s3_bucket}/${project_git_checkout}/output
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > 4_FINISHED.yml
+echo "project_git_checkout: ${project_git_checkout}" >> 4_FINISHED.yml
+echo "instance_id: $INSTANCE_ID" > 4_FINISHED.yml
+
 aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
 aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/${project_git_checkout}/latest/status/
+aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/4_FINISHED/$INSTANCE_ID
 
 echo "[${namespace}][${project}][$(date)] Finish tests"
 

@@ -76,7 +76,7 @@ The job status is stored on a S3 bucket, alongside echidna's output:
 4. Finished
 5. Deprovisioned
 
-Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (1 -> 2, 4 -> 5). **Note:** Currently the state `Deprovisioned` is not implemented. The current infrastructure will still exist until the next run. The only thing that is shut down is the EC2 Instance.
+Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (1 -> 2, 4 -> 5).
 
 In order to visualize echidna's output, the easiest way is to download the logs from S3:
 
@@ -88,5 +88,4 @@ aws s3 cp s3://$REMOTE_ECHIDNA_S3_BUCKET/${project_git_checkout}/latest/cloud-in
 
 - [ ] Create a better way to visualize echidna output
 - [ ] Create a better way to monitor echidna ETA (depends on [crytic/echidna#975](https://github.com/crytic/echidna/issues/975))
-- [ ] Deprovision terraform resources after the job finishes
 - [ ] Create AMI with all required software instead of [installing everything](./terraform/user_data.tftpl) at each time (would speed up about 1min)
