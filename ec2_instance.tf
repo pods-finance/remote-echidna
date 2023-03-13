@@ -23,7 +23,7 @@ resource "aws_instance" "ec2_instance" {
   user_data_replace_on_change = true
 
   tags = {
-    Name = "${var.namespace}-${var.project}-instance"
+    Name = "${var.namespace}-${var.project}-${var.project_git_checkout}-instance"
   }
 
   key_name = var.ec2_instance_key_name
