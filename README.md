@@ -24,18 +24,17 @@ This project creates the following infrastructure on AWS:
 
 ## Usage with GitHub Actions
 
-1. Add this project as a dependency of the repository you want to test as a git submodule
-
-```
-git submodule add https://github.com/aviggiano/remote-echidna.git
-```
-
-2. Create a GitHub Action on your CI that reuses remote-echidna's [workflow](./.github/workflows/remote-echidna.yml). See a [sample project](https://github.com/aviggiano/remote-echidna-demo) here
+Create a GitHub Action on your CI that reuses remote-echidna's [workflow](./.github/workflows/remote-echidna.yml). See a [sample project](https://github.com/aviggiano/remote-echidna-demo) here
 
 ```
 name: Push
 
-on: [pull_request, push]
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - main
 
 jobs:
   remote-echidna:
