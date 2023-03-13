@@ -37,8 +37,8 @@ jobs:
         working-directory: remote-echidna
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+      - name: Clone remote-echidna
+        run: git submodule add https://github.com/aviggiano/remote-echidna.git
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
