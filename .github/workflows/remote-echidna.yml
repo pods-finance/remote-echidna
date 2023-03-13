@@ -58,6 +58,11 @@ jobs:
       - name: Provision
         working-directory: ./remote-echidna
         run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
+      - name: Terraform validate
+        working-directory: ./remote-echidna
+        run: |
+          terraform init
+          terraform validate
       - name: Destroy previous instance
         working-directory: ./remote-echidna
         run: |
