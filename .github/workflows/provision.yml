@@ -1,4 +1,4 @@
-name: Remote Echidna 
+name: Provision
 
 on:
   workflow_call:
@@ -29,8 +29,8 @@ on:
 
 
 jobs:
-  remote-echidna:
-    name: Run remote-echidna
+  provision:
+    name: Provision resources
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,9 +55,6 @@ jobs:
           echo 's3_bucket = "${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}"' >> vars.tfvars
           echo 'ec2_instance_key_name = "${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}"' >> vars.tfvars
           echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> vars.tfvars
-      - name: Deprovision old jobs
-        working-directory: ./remote-echidna
-        run: ./scripts/deprovision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
       - name: Provision
         working-directory: ./remote-echidna
         run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
