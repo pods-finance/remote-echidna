@@ -12,7 +12,7 @@ for instance_id in $(aws s3 ls s3://$S3_BUCKET/4_FINISHED/ | awk '{print $NF}');
   INSTANCE_ID=$(grep 'instance_id:' $instance_id); INSTANCE_ID=${INSTANCE_ID//*instance_id: /}; 
 
   NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  DATEDIFF=$(( ($(date --date="$NOW" +%s) - $(date --date="$DATE" +%s) )/(60*60*24) ))
+  DATEDIFF=$(( ($(date --date="$NOW" +%s) - $(date --date="$DATE" +%s) ) ))
 
   if [ "$DATEDIFF" -gt 0 ]; then
     aws s3 cp s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/terraform.tfstate .
