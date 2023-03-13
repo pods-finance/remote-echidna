@@ -1,3 +1,8 @@
+locals {
+  prefix = "${var.namespace}-${var.project}-${substr(sha256(var.project_git_checkout), 0, 8)}-instance"
+}
+
+
 variable "namespace" {
   type        = string
   description = "Namespace of the remote echidna infrastructure"

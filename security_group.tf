@@ -3,7 +3,7 @@ data "aws_vpc" "default" {
 }
 
 resource "aws_security_group" "security_group" {
-  name   = "${var.namespace}-${var.project}-${var.project_git_checkout}-sg"
+  name   = "${local.prefix}-sg"
   vpc_id = data.aws_vpc.default.id
 
   ingress {
