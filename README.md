@@ -4,26 +4,16 @@ Run echidna on AWS with Terraform
 
 ## Description
 
-This project creates an instance, together with other AWS resources, for each echidna job. The instance starts up, install all required components, runs the fuzz tests, and automatically shuts down itself afterwards.
-
-In order to guarantee that all provisioned resources are deleted after the job, the job state is stored on a S3 bucket. A job can go through some stages:
-
-1. Provisioned
-2. Started
-3. Running
-4. Finished
-5. Deprovisioned
-
-Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (1 -> 2, 4 -> 5).
-
-**Note:** Currently the state `Deprovisioned` is not implemented. The current infrastructure will still exist until the next run. The only thing that is shut down is the EC2 Instance.
+This project creates a virtual machine, together with other required AWS resources, for each echidna job. The instance starts up, install all required components, runs the fuzz tests, and automatically shuts itself down afterwards.
 
 ## Setup
 
-Manual steps:
+### Manual steps:
 
 1. Create a [S3 bucket](./terraform/s3_bucket.tf) with private access to store and load echidna's output between runs
-2. Create a [private key](./terraform/ec2_instance.tf) used to connect to the remote instance and download it to your local machine
+2. Create a [private key](./terraform/ec2_instance.tf) used to connect to the remote instance if needed
+
+### Automated steps:
 
 This project creates the following infrastructure on AWS:
 
@@ -32,80 +22,72 @@ This project creates the following infrastructure on AWS:
 - [IAM User](./terraform/iam_user.tf) with the created IAM Policy
 - [EC2 Instance](./terraform/ec2_instance.tf) that runs echidna on the desired git project and uses the IAM User credentials to upload results to S3
 
-## Usage with Terraform Cloud
+## Usage with GitHub Actions
 
-1. Add this project as a dependency of the repository you want to test. The easiest way is with a git module
+1. Add this project as a dependency of the repository you want to test as a git submodule
 
 ```
 git submodule add https://github.com/aviggiano/remote-echidna.git
 ```
 
-2. Create a [Workspace](https://app.terraform.io/app/YOUR_ORG/workspaces/new) with `Version control workflow` on Terraform Cloud and link your Github project
+2. Create a GitHub Action on your CI that reuses remote-echidna's [workflow](./.github/workflows/remote-echidna.yml). See a [sample project](https://github.com/aviggiano/remote-echidna-demo) here
 
-3. Add the the parameters below to your [Workspace variables](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/variables) on Terraform Cloud, including `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` as environment variables
+```
+name: Push
 
-4. Configure your [Working Directory](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/settings/general) as `remote-echidna`
+on: [pull_request, push]
 
-5. Set `Include submodules on clone` on the [Version Control](https://app.terraform.io/app/YOUR_ORG/workspaces/YOUR_WORKSPACE/settings/version-control) settings
+jobs:
+  remote-echidna:
+    name: Run remote-echidna
+    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@main
+    with:
+      project: "remote-echidna-demo"
+      project_git_url: "https://github.com/${{github.repository}}.git"
+      project_git_checkout: ${{ github.head_ref || github.ref_name }}
+      run_tests_cmd: "echidna-test contracts/Contract.sol --contract Contract --config config.yaml || true"
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REMOTE_ECHIDNA_S3_BUCKET: ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
+      REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME: ${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}
+```
+
+3. Configure the required input parameters below
 
 ### Inputs
 
-| Parameter               | Description                                                                  | Example                                                                                          | Required |
-| ----------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | -------- |
-| `ec2_instance_key_name` | EC2 instance key name. Needs to be manually created first on the AWS console | `key.pem`                                                                                        | Yes      |
-| `project`               | Your project name                                                            | `smart-contracts`                                                                                | Yes      |
-| `project_git_url`       | Project Git URL                                                              | `https://github.com/aviggiano/smart-contracts.git`                                               | Yes      |
-| `project_git_checkout`  | Project Git checkout (branch or commit hash)                                 | `main`                                                                                           | Yes      |
-| `s3_bucket`             | S3 Bucket name to store and load echidna's output between runs               | `remote-echidna-bucket`                                                                          | Yes      |
-| `run_tests_cmd`         | Command to run echidna tests                                                 | `yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml \|\| true` | Yes      |
+| Parameter                              | Description                                                                  | Example                                                                                  | Required |
+| -------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------- |
+| `project`                              | Your project name                                                            | `remote-echidna-demo`                                                                    | Yes      |
+| `project_git_url`                      | Project Git URL                                                              | `https://github.com/aviggiano/remote-echidna-demo.git`                                   | Yes      |
+| `project_git_checkout`                 | Project Git checkout (branch or commit hash)                                 | `main`                                                                                   | Yes      |
+| `run_tests_cmd`                        | Command to run echidna tests                                                 | `echidna-test contracts/Contract.sol --contract Contract --config config.yaml \|\| true` | Yes      |
+| `REMOTE_ECHIDNA_S3_BUCKET`             | S3 Bucket name to store and load echidna's output between runs               | `remote-echidna-demo-bucket`                                                             | Yes      |
+| `REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME` | EC2 instance key name. Needs to be manually created first on the AWS console | `key.pem`                                                                                | Yes      |
 
-### Example usage
+## Output
 
-```
-steps:
-- uses: hashicorp/setup-terraform@v2
-  with:
-    cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-- name: Terraform Init
-  run: terraform init
-- name: Terraform Apply
-  env:
-    project: 'smart-contracts'
-    project_git_url: 'https://github.com/${{github.repository}}.git'
-    project_git_checkout: ${{ github.head_ref || github.ref_name }}
-    s3_bucket: 'remote-echidna'
-    ec2_instance_key_name: 'key.pem'
-    run_tests_cmd: 'yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml'
-  run: |
-    terraform init
-    terraform apply -var="ec2_instance_key_name=${{ env.ec2_instance_key_name }}" -var="project=${{ env.project }}" -var="project_git_url=${{ env.project_git_url }}" -var="project_git_checkout=${{ env.project_git_checkout }}" -var="run_tests_cmd=${{ env.run_tests_cmd }}" -var="s3_bucket=${{ env.s3_bucket }}" -no-color -input=false -auto-approve
-```
+The job status is stored on a S3 bucket, alongside echidna's output:
 
-## Development
+1. Provisioned
+2. Started
+3. Running
+4. Finished
+5. Deprovisioned
 
-#### 1. Create a `tfvars` file
+Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (1 -> 2, 4 -> 5). **Note:** Currently the state `Deprovisioned` is not implemented. The current infrastructure will still exist until the next run. The only thing that is shut down is the EC2 Instance.
 
-Include the parameters required by [vars.tf](./terraform/vars.tf)
+In order to visualize echidna's output, the easiest way is to download the logs from S3:
 
 ```
-# vars.tfvars
-
-project               = "echidna-project"
-project_git_url       = "https://github.com/aviggiano/echidna-project.git"
-project_git_checkout  = "main"
-ec2_instance_key_name = "key.pem"
-s3_bucket             = "remote-echidna"
-run_tests_cmd         = "yarn && echidna-test test/Contract.sol --contract Contract --config test/config.yaml || true"
-```
-
-### 2. Run terraform
-
-```
-terraform apply -var-file vars.tfvars
+aws s3 cp s3://$REMOTE_ECHIDNA_S3_BUCKET/${project_git_checkout}/latest/cloud-init-output.log .
 ```
 
 ## Next steps
 
-- [ ] Improve state management to avoid conflicting runs from multiple people
-- [ ] Perform cleanup of terraform state after the job finishes
+- [ ] Create a better way to visualize echidna output
+- [ ] Create a better way to monitor echidna ETA (depends on [crytic/echidna#975](https://github.com/crytic/echidna/issues/975))
+- [ ] Deprovision terraform resources after the job finishes
 - [ ] Create AMI with all required software instead of [installing everything](./terraform/user_data.tftpl) at each time (would speed up about 1min)
