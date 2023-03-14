@@ -70,13 +70,14 @@ jobs:
 
 The job status is stored on a S3 bucket, alongside echidna's output:
 
+0. Provisioning
 1. Provisioned
 2. Started
 3. Running
 4. Finished
 5. Deprovisioned
 
-Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (1 -> 2, 4 -> 5).
+Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (0 -> 1 -> 2, 4 -> 5).
 
 In order to visualize echidna's output, the easiest way is to download the logs from S3:
 

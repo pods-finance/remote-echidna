@@ -47,8 +47,7 @@ jobs:
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **Hello**
-            🌏
+            **[remote-echidna]** 🦔 0_PROVISIONING
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -86,3 +85,7 @@ jobs:
       - name: Provisioned
         working-directory: ./remote-echidna
         run: ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }}
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **[remote-echidna]** 🦔 1_PROVISIONED (${{ steps.apply.outputs.EC2_INSTANCE_ID }})
