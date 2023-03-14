@@ -1,10 +1,14 @@
 # remote-echidna
 
-Run echidna on AWS with Terraform
+Run echidna on AWS
+
+## Motivation
+
+[Echidna](https://github.com/crytic/echidna) is a program designed for fuzzing/property-based testing of Ethereum smart contracts. Because of its high demand on computational resources, it is not very practical to run long runs on your local development environment. The purpose of remote-echidna is to allow developers to test their contracts on AWS while they can continue working on something else.
 
 ## Description
 
-This project creates a virtual machine, together with other required AWS resources, for each echidna job. The instance starts up, install all required components, runs the fuzz tests, and automatically shuts itself down afterwards.
+This project uses Terraform to create a virtual machine, together with other required AWS resources, for each echidna job. The instance starts up, install all required components, runs the fuzz tests, and automatically shuts itself down.
 
 ## Setup
 
@@ -39,7 +43,7 @@ on:
 jobs:
   remote-echidna:
     name: Run remote-echidna
-    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@v1
+    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@v1.1
     with:
       project: "remote-echidna-demo"
       project_git_url: "https://github.com/${{github.repository}}.git"
@@ -87,7 +91,5 @@ aws s3 cp s3://$REMOTE_ECHIDNA_S3_BUCKET/${project_git_checkout}/latest/cloud-in
 
 ## Next steps
 
-- [ ] Create a better way to visualize echidna output
 - [ ] Create a better way to monitor echidna ETA (depends on [crytic/echidna#975](https://github.com/crytic/echidna/issues/975))
 - [ ] Create AMI with all required software instead of [installing everything](./terraform/user_data.tftpl) at each time (would speed up about 1min)
-- [ ] Verify best instance for the job
