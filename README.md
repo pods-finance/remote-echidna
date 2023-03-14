@@ -31,30 +31,50 @@ This project creates the following infrastructure on AWS:
 Create a GitHub Action on your CI that reuses remote-echidna's [workflow](./.github/workflows/remote-echidna.yml). See a [sample project](https://github.com/aviggiano/remote-echidna-demo) here
 
 ```
-name: Push
+name: Pull Request
 
 on:
   pull_request:
     types: [opened, synchronize]
-  push:
-    branches:
-      - main
 
 jobs:
   remote-echidna:
     name: Run remote-echidna
-    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@v1.1
+    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@v2
     with:
       project: "remote-echidna-demo"
       project_git_url: "https://github.com/${{github.repository}}.git"
       project_git_checkout: ${{ github.head_ref || github.ref_name }}
-      run_tests_cmd: "echidna-test contracts/Contract.sol --contract Contract --config config.yaml || true"
+      run_tests_cmd: "echidna-test contracts/Contract.sol --contract Contract --config config.yaml"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       REMOTE_ECHIDNA_S3_BUCKET: ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
       REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME: ${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}
+```
+
+You may also choose to include the following action to have the GitHub bot update your Pull Request with a comment monitoring the job status:
+
+```
+name: Update PR comments
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '* * * * *'
+
+jobs:
+  update-pr-comments:
+    name: Update PR comments
+    permissions:
+      pull-requests: write
+    uses: aviggiano/remote-echidna/.github/workflows/update-pr-comments.yml@v2
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REMOTE_ECHIDNA_S3_BUCKET: ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
 ```
 
 3. Configure the required input parameters below
