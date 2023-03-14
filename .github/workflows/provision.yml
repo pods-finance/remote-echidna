@@ -60,7 +60,7 @@ jobs:
           echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> vars.tfvars
       - name: Provision
         working-directory: ./remote-echidna
-        run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
+        run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ env.URL }} ${{ env.GITHUB_TOKEN }}
       - name: Terraform validate
         working-directory: ./remote-echidna
         run: |
