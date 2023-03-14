@@ -64,17 +64,17 @@ jobs:
       - name: Provision
         working-directory: ./remote-echidna
         run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
-      - name: Check if this is the first run
-        id: is_first_run
-        uses: andstor/file-existence-action@v1
-        with:
-          files: "./remote-echidna/vars.tfvars"
       - name: Get PR number
         id: pr_number
         working-directory: ./remote-echidna
         run: |
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_OUTPUT
+      - name: Check if this is the first run
+        id: is_first_run
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "./remote-echidna/vars.tfvars"
       - name: Create tfvars file
         if: steps.is_first_run.outputs.files_exists != 'true'
         working-directory: ./remote-echidna
