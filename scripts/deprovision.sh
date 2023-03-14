@@ -27,6 +27,7 @@ for instance_id in $(aws s3 ls s3://$S3_BUCKET/4_FINISHED/ | awk '{print $NF}');
     
     aws s3 cp 5_DEPROVISIONED.yml s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/$INSTANCE_ID/status/
     aws s3 cp 5_DEPROVISIONED.yml s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/latest/status/
+    aws s3 rm s3://$S3_BUCKET/4_FINISHED/$INSTANCE_ID
   fi
 done;
 
