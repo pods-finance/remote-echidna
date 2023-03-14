@@ -76,7 +76,7 @@ jobs:
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_OUTPUT
       - name: Create tfvars file
-        if: steps.check_files.outputs.is_first_run == 'true'
+        if: steps.check_files.outputs.is_first_run != 'true'
         working-directory: ./remote-echidna
         run: |
           echo 'project = "${{ inputs.project }}"' >> vars.tfvars
