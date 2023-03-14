@@ -16,5 +16,5 @@ echo "pr_number: $PR_NUMBER" >> 1_PROVISIONED.yml
 aws s3 cp 1_PROVISIONED.yml s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/$INSTANCE_ID/status/
 aws s3 cp 1_PROVISIONED.yml s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/latest/status/
 aws s3 cp 1_PROVISIONED.yml s3://$S3_BUCKET/1_PROVISIONED/$INSTANCE_ID
-aws s3 cp terraform.tfstate s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/
-aws s3 cp vars.tfvars s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/
+aws s3 cp terraform.tfstate s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/$PR_NUMBER/
+aws s3 cp vars.tfvars s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/$PR_NUMBER/
