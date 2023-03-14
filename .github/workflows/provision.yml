@@ -32,8 +32,6 @@ jobs:
   provision:
     name: Provision resources
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
       - uses: actions/checkout@v3
       - name: Clone remote-echidna
