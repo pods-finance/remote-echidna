@@ -1,4 +1,4 @@
-name: Update PR Comments
+name: Update PR comments
 
 on:
   workflow_call:
@@ -14,6 +14,7 @@ on:
 
 jobs:
   update_pr_comments:
+    name: Update PR comments
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
