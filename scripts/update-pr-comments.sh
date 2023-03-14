@@ -6,6 +6,7 @@ S3_BUCKET="$1"
 
 function get_pr_number() {
   status=$1
+  rm PR_NUMBER
   for instance_id_yml in $(aws s3 ls s3://$S3_BUCKET/$status/ | awk '{print $NF}'); do
     aws s3 cp s3://$S3_BUCKET/$status/$instance_id_yml .
     cat $instance_id_yml
