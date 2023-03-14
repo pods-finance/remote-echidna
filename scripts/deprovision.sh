@@ -10,13 +10,15 @@ for instance_id_yml in $(aws s3 ls s3://$S3_BUCKET/4_FINISHED/ | awk '{print $NF
   DATE=$(grep 'date:' $instance_id_yml); DATE=${DATE//*date: /};
   PROJECT_GIT_CHECKOUT=$(grep 'project_git_checkout:' $instance_id_yml); PROJECT_GIT_CHECKOUT=${PROJECT_GIT_CHECKOUT//*project_git_checkout: /};
   INSTANCE_ID=$(grep 'instance_id:' $instance_id_yml); INSTANCE_ID=${INSTANCE_ID//*instance_id: /};
+  PR_NUMBER=$(grep 'pr_number:' $instance_id_yml); PR_NUMBER=${PR_NUMBER//*pr_number: /};
+  PR_NUMBER=${PR_NUMBER:-undefined}
 
   NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   DATEDIFF=$(( ($(date --date="$NOW" +%s) - $(date --date="$DATE" +%s) )/(60*60*24) ))
 
   if [ "$DATEDIFF" -gt 0 ]; then
-    aws s3 cp s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/terraform.tfstate .
-    aws s3 cp s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/vars.tfvars .
+    aws s3 cp s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/$PR_NUMBER/terraform.tfstate .
+    aws s3 cp s3://$S3_BUCKET/project_git_checkout/$PROJECT_GIT_CHECKOUT/$PR_NUMBER/vars.tfvars .
 
     terraform init
     terraform destroy -var-file vars.tfvars -no-color -input=false -auto-approve
