@@ -28,7 +28,7 @@ variable "s3_bucket" {
 variable "instance_type" {
   type        = string
   description = "Instance type to run echidna on"
-  default     = "c5.4xlarge"
+  default     = "c5.2xlarge"
 }
 
 variable "ec2_instance_key_name" {
