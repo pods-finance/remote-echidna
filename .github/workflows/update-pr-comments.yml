@@ -31,19 +31,21 @@ jobs:
         id: pr_numbers
         working-directory: ./remote-echidna
         run: ./scripts/update-pr-comments.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
-      - run: echo "DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+      - name: Get date
+        id: date
+        run: echo "DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.pr_numbers.outputs.DATE }}]** 2_STARTED
-          issue: $PR_NUMBER_2_STARTED
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 2_STARTED
+          issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_2_STARTED }}
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.pr_numbers.outputs.DATE }}]** 3_RUNNING
-          issue: $PR_NUMBER_3_RUNNING
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 3_RUNNING
+          issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_3_RUNNING }}
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.pr_numbers.outputs.DATE }}]** 4_FINISHED
-          issue: $PR_NUMBER_4_FINISHED
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED \n\n ${{ steps.pr_numbers.outputs.ECHIDNA_LOGS }}
+          issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_4_FINISHED }}
