@@ -49,16 +49,16 @@ jobs:
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 2_STARTED
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 2_STARTED (${{ steps.pr_numbers.outputs.INSTANCE_ID_2_STARTED }})
           issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_2_STARTED }}
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 3_RUNNING
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 3_RUNNING (${{ steps.pr_numbers.outputs.INSTANCE_ID_3_RUNNING }})
           issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_3_RUNNING }}
       - uses: mshick/add-pr-comment@v2
         if: steps.logs_exists.outputs.files_exists == 'true'
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED \n\n ${{ steps.logs.outputs.content }}
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED (${{ steps.pr_numbers.outputs.INSTANCE_ID_4_FINISHED }}) \n\n ${{ steps.logs.outputs.content }}
           issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_4_FINISHED }}

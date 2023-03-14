@@ -7,6 +7,7 @@ S3_BUCKET="$1"
 function get_pr_number() {
   status=$1
   rm PR_NUMBER
+  rm INSTANCE_ID
   for instance_id_yml in $(aws s3 ls s3://$S3_BUCKET/$status/ | awk '{print $NF}'); do
     aws s3 cp s3://$S3_BUCKET/$status/$instance_id_yml .
     cat $instance_id_yml
@@ -21,18 +22,25 @@ function get_pr_number() {
 
     aws s3 rm s3://$S3_BUCKET/$status/$INSTANCE_ID
     echo "$PR_NUMBER" > PR_NUMBER
+    echo "$INSTANCE_ID" > INSTANCE_ID
     break;
   done;
 }
 
 get_pr_number 2_STARTED
 PR_NUMBER_2_STARTED=$(cat PR_NUMBER)
+INSTANCE_ID_2_STARTED=$(cat INSTANCE_ID)
 echo "PR_NUMBER_2_STARTED=${PR_NUMBER_2_STARTED}" >> $GITHUB_OUTPUT
+echo "INSTANCE_ID_2_STARTED=${INSTANCE_ID_2_STARTED}" >> $GITHUB_OUTPUT
 
 get_pr_number 3_RUNNING
 PR_NUMBER_3_RUNNING=$(cat PR_NUMBER)
+INSTANCE_ID_3_RUNNING=$(cat INSTANCE_ID)
 echo "PR_NUMBER_3_RUNNING=${PR_NUMBER_3_RUNNING}" >> $GITHUB_OUTPUT
+echo "INSTANCE_ID_3_RUNNING=${INSTANCE_ID_3_RUNNING}" >> $GITHUB_OUTPUT
 
 get_pr_number 4_FINISHED
 PR_NUMBER_4_FINISHED=$(cat PR_NUMBER)
+INSTANCE_ID_4_FINISHED=$(cat INSTANCE_ID)
 echo "PR_NUMBER_4_FINISHED=${PR_NUMBER_4_FINISHED}" >> $GITHUB_OUTPUT
+echo "INSTANCE_ID_4_FINISHED=${INSTANCE_ID_4_FINISHED}" >> $GITHUB_OUTPUT
