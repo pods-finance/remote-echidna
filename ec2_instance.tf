@@ -34,6 +34,7 @@ resource "aws_instance" "ec2_instance" {
     solidity_version      = var.solidity_version,
     project_git_url       = var.project_git_url,
     project_git_checkout  = var.project_git_checkout,
+    pr_number             = var.pr_number,
     run_tests_cmd         = var.run_tests_cmd,
     aws_access_key_id     = aws_iam_access_key.iam_user_access_key.id,
     aws_secret_access_key = aws_iam_access_key.iam_user_access_key.secret,

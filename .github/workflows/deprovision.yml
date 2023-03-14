@@ -15,7 +15,7 @@ on:
 
 jobs:
   deprovision:
-    name: Deprovision resources
+    name: Deprovision old jobs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

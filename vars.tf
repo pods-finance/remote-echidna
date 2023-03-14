@@ -52,6 +52,12 @@ variable "project_git_checkout" {
   description = "Project Git checkout (branch or commit hash)"
 }
 
+variable "pr_number" {
+  type        = string
+  description = "GitHub PR number to output logs on"
+  default     = ""
+}
+
 variable "run_tests_cmd" {
   type        = string
   description = "Command to run echidna tests"

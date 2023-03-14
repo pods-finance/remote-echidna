@@ -15,6 +15,12 @@ on:
       run_tests_cmd:
         required: true
         type: string
+      instance_type:
+        required: false
+        type: string
+      solidity_version:
+        required: false
+        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -30,7 +36,7 @@ on:
 
 jobs:
   provision:
-    name: Provision resources
+    name: Provision a new job
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -47,20 +53,26 @@ jobs:
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[remote-echidna]** 🦔 0_PROVISIONING
+            **[remote-echidna]** ☁️🦔 0_PROVISIONING
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_wrapper: false
       - name: Create tfvars file
         working-directory: ./remote-echidna
+        id: tfvars
         run: |
-          echo 'project = "${{ inputs.project }}"' > vars.tfvars
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_OUTPUT
+          echo 'project = "${{ inputs.project }}"' >> vars.tfvars
           echo 'project_git_url = "${{ inputs.project_git_url }}"' >> vars.tfvars
           echo 'project_git_checkout = "${{ inputs.project_git_checkout }}"' >> vars.tfvars
           echo 's3_bucket = "${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}"' >> vars.tfvars
           echo 'ec2_instance_key_name = "${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}"' >> vars.tfvars
           echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> vars.tfvars
+          [[ -v ${{ inputs.instance_type }} ]] && echo 'instance_type = "${{ inputs.instance_type }}"' >> vars.tfvars
+          [[ -v ${{ inputs.solidity_version }} ]] && echo 'solidity_version = "${{ inputs.solidity_version }}"' >> vars.tfvars
+          [[ -v $PR_NUMBER ]] && echo 'pr_number = "$PR_NUMBER"' >> vars.tfvars
       - name: Provision
         working-directory: ./remote-echidna
         run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
@@ -73,19 +85,22 @@ jobs:
         working-directory: ./remote-echidna
         run: |
           terraform init
-          terraform destroy -target aws_instance.ec2_instance -var-file vars.tfvars -no-color -input=false -auto-approve
+          terraform destroy -target aws_instance.ec2_instance -var-file vars.tfvars -input=false -auto-approve
       - name: Terraform Apply
         id: apply
         working-directory: ./remote-echidna
         run: |
           terraform init
-          terraform apply -var-file vars.tfvars -no-color -input=false -auto-approve
+          terraform apply -var-file vars.tfvars -input=false -auto-approve
           EC2_INSTANCE_ID=$(terraform output ec2_instance_id)
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output ec2_instance_public_ip)
           echo "EC2_INSTANCE_ID=${EC2_INSTANCE_ID}" >> $GITHUB_OUTPUT
+          echo "EC2_INSTANCE_PUBLIC_IP=${EC2_INSTANCE_PUBLIC_IP}" >> $GITHUB_OUTPUT
       - name: Provisioned
         working-directory: ./remote-echidna
-        run: ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }}
+        run: |
+          ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }} ${{ steps.tfvars.outputs.PR_NUMBER }} 
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[remote-echidna]** 🦔 1_PROVISIONED (${{ steps.apply.outputs.EC2_INSTANCE_ID }})
+            **[remote-echidna]** ☁️🦔 1_PROVISIONED (${{ steps.apply.outputs.EC2_INSTANCE_ID }}, ${{ steps.apply.outputs.EC2_INSTANCE_PUBLIC_IP }})

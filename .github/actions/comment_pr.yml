@@ -4,6 +4,9 @@ inputs:
   body:
     description: "Comment body"
     required: true
+  prNumber:
+    description: "Pull Request number"
+    required: false
 
 runs:
   using: "composite"
@@ -11,37 +14,28 @@ runs:
     - uses: actions/github-script@v6
       with:
         script: |
-          if(!context.payload.pull_request) return
-          const prNumber = context.payload.pull_request.number
-          const commitSha = context.payload.pull_request.head.sha
+          if(!context.payload.pull_request && !inputs.prNumber) return
+          const prNumber = inputs.prNumber || context.payload.pull_request.number 
+          const date = (new Date()).toISOString()
           const { data: comments } = await github.rest.issues.listComments({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: prNumber
           })
-          const {
-            data: {
-              head: { ref: branch }
-            }
-          } = await github.rest.pulls.get({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: prNumber
-          })
           const botComment = comments.find((comment) => comment.user.login === 'github-actions[bot]')
-          const body = `${{ inputs.body }}`
+          const newCommentBody = `${date}\t${{ inputs.body }}`
           if (botComment) {
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: botComment.id,
-              body
+              body: `${botComment.body}\n${newCommentBody}`
             })
           } else {
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
-              body
+              body: `${newCommentBody}``
             })
           }
