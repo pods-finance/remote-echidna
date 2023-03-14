@@ -68,7 +68,7 @@ jobs:
         id: is_first_run
         uses: andstor/file-existence-action@v1
         with:
-          files: "vars.tfvars"
+          files: "./remote-echidna/vars.tfvars"
       - name: Get PR number
         id: pr_number
         working-directory: ./remote-echidna
