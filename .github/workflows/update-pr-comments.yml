@@ -61,5 +61,5 @@ jobs:
         if: steps.logs_exists.outputs.files_exists == 'true'
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED (${{ steps.pr_numbers.outputs.INSTANCE_ID_4_FINISHED }}) <br/><br/> ```${{ steps.logs.outputs.content }}```
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED (${{ steps.pr_numbers.outputs.INSTANCE_ID_4_FINISHED }})<br/><br/><pre><code>${{ steps.logs.outputs.content }}</code></pre>
           issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_4_FINISHED }}
