@@ -32,6 +32,8 @@ jobs:
   provision:
     name: Provision resources
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     env:
       URL: ${{ github.event.issue.comments_url }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
