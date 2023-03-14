@@ -38,6 +38,7 @@ jobs:
           files: "./remote-echidna/logs.txt"
       - name: Read logs.txt
         if: steps.logs_exists.outputs.files_exists == 'true'
+        id: logs
         uses: juliangruber/read-file-action@v1
         with:
           path: ./remote-echidna/logs.txt
