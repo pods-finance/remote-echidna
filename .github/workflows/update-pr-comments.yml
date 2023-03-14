@@ -1,0 +1,39 @@
+name: Update PR Comments
+
+on:
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_REGION:
+        required: true
+      REMOTE_ECHIDNA_S3_BUCKET:
+        required: true
+
+jobs:
+  update_pr_comments:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get 
+        working-directory: ./remote-echidna
+        run: ./scripts/update-pr-comments.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
+      - run: echo "DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **[☁️🦔][remote-echidna][$DATE]** 2_STARTED
+          issue: $PR_NUMBER_2_STARTED
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **[☁️🦔][remote-echidna][$DATE]** 3_RUNNING
+          issue: $PR_NUMBER_3_RUNNING
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **[☁️🦔][remote-echidna][$DATE]** 4_FINISHED
+          issue: $PR_NUMBER_4_FINISHED

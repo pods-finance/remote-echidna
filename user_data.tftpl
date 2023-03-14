@@ -31,8 +31,9 @@ echo "project_git_checkout: ${project_git_checkout}" >> 2_STARTED.yml
 echo "instance_id: $INSTANCE_ID" >> 2_STARTED.yml
 echo "pr_number: ${pr_number}" >> 2_STARTED.yml
 
-aws s3 cp 2_STARTED.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
-aws s3 cp 2_STARTED.yml s3://${s3_bucket}/${project_git_checkout}/latest/status/
+aws s3 cp 2_STARTED.yml s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/$INSTANCE_ID/status/
+aws s3 cp 2_STARTED.yml s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/latest/status/
+aws s3 cp 2_STARTED.yml s3://${s3_bucket}/2_STARTED/$INSTANCE_ID
 
 echo "[${namespace}][${project}][$(date)] Install Node.js"
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
@@ -64,7 +65,7 @@ cd "$(basename ${project_git_url} .git)"
 git checkout ${project_git_checkout}
 
 echo "[${namespace}][${project}][$(date)] Load previous output from S3"
-aws s3 sync s3://${s3_bucket}/${project_git_checkout}/output/ $ECHIDNA_DIRECTORY/ 
+aws s3 sync s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/output/ $ECHIDNA_DIRECTORY/
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > 3_RUNNING.yml
@@ -72,19 +73,20 @@ echo "project_git_checkout: ${project_git_checkout}" >> 3_RUNNING.yml
 echo "instance_id: $INSTANCE_ID" >> 3_RUNNING.yml
 echo "pr_number: ${pr_number}" >> 3_RUNNING.yml
 
-aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
-aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/${project_git_checkout}/latest/status/
+aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/$INSTANCE_ID/status/
+aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/latest/status/
+aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/3_RUNNING/$INSTANCE_ID
 
 echo "[${namespace}][${project}][$(date)] Run tests"
 echo "[${namespace}][${project}][$(date)] '${run_tests_cmd}'"
 ${run_tests_cmd} | tee logs.txt
 
 echo "[${namespace}][${project}][$(date)] Copy output to S3"
-aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/
-aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/${project_git_checkout}/latest/
-aws s3 cp logs.txt s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/
-aws s3 cp logs.txt s3://${s3_bucket}/${project_git_checkout}/latest/
-aws s3 sync $ECHIDNA_DIRECTORY/ s3://${s3_bucket}/${project_git_checkout}/output/
+aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/$INSTANCE_ID/
+aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/latest/
+aws s3 cp logs.txt s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/$INSTANCE_ID/
+aws s3 cp logs.txt s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/latest/
+aws s3 sync $ECHIDNA_DIRECTORY/ s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/output/
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 echo "date: $DATE" > 4_FINISHED.yml
@@ -92,8 +94,8 @@ echo "project_git_checkout: ${project_git_checkout}" >> 4_FINISHED.yml
 echo "instance_id: $INSTANCE_ID" >> 4_FINISHED.yml
 echo "pr_number: ${pr_number}" >> 4_FINISHED.yml
 
-aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/status/
-aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/${project_git_checkout}/latest/status/
+aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/$INSTANCE_ID/status/
+aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/project_git_checkout/${project_git_checkout}/latest/status/
 aws s3 cp 4_FINISHED.yml s3://${s3_bucket}/4_FINISHED/$INSTANCE_ID
 
 echo "[${namespace}][${project}][$(date)] Finish tests"
