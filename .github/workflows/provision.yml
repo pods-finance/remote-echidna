@@ -80,7 +80,7 @@ jobs:
         working-directory: ./remote-echidna
         run: ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }}
       - name: Comment PR
-        uses: actions/comment_pr@main
+        uses: ./.github/actions/comment_pr.yml
         with:
           body: "1_PROVISIONED ${{ steps.apply.outputs.EC2_INSTANCE_ID }}"
 
