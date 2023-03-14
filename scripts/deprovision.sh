@@ -11,7 +11,7 @@ for instance_id_yml in $(aws s3 ls s3://$S3_BUCKET/4_FINISHED/ | awk '{print $NF
   PROJECT_GIT_CHECKOUT=$(grep 'project_git_checkout:' $instance_id_yml); PROJECT_GIT_CHECKOUT=${PROJECT_GIT_CHECKOUT//*project_git_checkout: /};
   INSTANCE_ID=$(grep 'instance_id:' $instance_id_yml); INSTANCE_ID=${INSTANCE_ID//*instance_id: /};
   PR_NUMBER=$(grep 'pr_number:' $instance_id_yml); PR_NUMBER=${PR_NUMBER//*pr_number: /};
-  PR_NUMBER=${PR_NUMBER:-undefined}
+  PR_NUMBER=${PR_NUMBER:-null}
 
   NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   DATEDIFF=$(( ($(date --date="$NOW" +%s) - $(date --date="$DATE" +%s) )/(60*60*24) ))
