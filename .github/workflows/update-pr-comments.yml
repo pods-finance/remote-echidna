@@ -31,8 +31,13 @@ jobs:
         id: pr_numbers
         working-directory: ./remote-echidna
         run: ./scripts/update-pr-comments.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
+      - name: Check if logs.txt exists
+        id: logs_exists
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "./remote-echidna/logs.txt"
       - name: Read logs.txt
-        id: logs
+        if: steps.logs_exists.outputs.files_exists == 'true'
         uses: juliangruber/read-file-action@v1
         with:
           path: ./remote-echidna/logs.txt
@@ -52,6 +57,7 @@ jobs:
             **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 3_RUNNING
           issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_3_RUNNING }}
       - uses: mshick/add-pr-comment@v2
+        if: steps.logs_exists.outputs.files_exists == 'true'
         with:
           message: |
             **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED \n\n ${{ steps.logs.outputs.content }}
