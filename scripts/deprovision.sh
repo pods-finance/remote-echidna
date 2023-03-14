@@ -18,6 +18,7 @@ for instance_id in $(aws s3 ls s3://$S3_BUCKET/4_FINISHED/ | awk '{print $NF}');
     aws s3 cp s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/terraform.tfstate .
     aws s3 cp s3://$S3_BUCKET/$PROJECT_GIT_CHECKOUT/vars.tfvars .
 
+    terraform init
     terraform destroy -var-file vars.tfvars -no-color -input=false -auto-approve
 
     echo "date: $DATE" > 5_DEPROVISIONED.yml
