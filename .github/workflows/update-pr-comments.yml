@@ -33,7 +33,9 @@ jobs:
         run: ./scripts/update-pr-comments.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
       - name: Get date
         id: date
-        run: echo "DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+        run: |
+          DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo "DATE=${DATE}" >> $GITHUB_ENV
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
