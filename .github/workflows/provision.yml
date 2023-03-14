@@ -32,6 +32,8 @@ jobs:
   provision:
     name: Provision resources
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
       - name: Clone remote-echidna
@@ -42,10 +44,11 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Comment PR
-        uses: aviggiano/remote-echidna/.github/actions/comment_pr.yml@main
+      - uses: mshick/add-pr-comment@v2
         with:
-          body: "0_PROVISIONING"
+          message: |
+            **Hello**
+            🌏
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -83,9 +86,3 @@ jobs:
       - name: Provisioned
         working-directory: ./remote-echidna
         run: ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }}
-      - name: Comment PR
-        uses: aviggiano/remote-echidna/.github/actions/comment_pr.yml@main
-        with:
-          body: "1_PROVISIONED ${{ steps.apply.outputs.EC2_INSTANCE_ID }}"
-
-
