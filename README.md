@@ -86,7 +86,7 @@ jobs:
 | `project`                              | Your project name                                                            | `remote-echidna-demo`                                                                    | Yes      |
 | `project_git_url`                      | Project Git URL                                                              | `https://github.com/aviggiano/remote-echidna-demo.git`                                   | Yes      |
 | `project_git_checkout`                 | Project Git checkout (branch or commit hash)                                 | `main`                                                                                   | Yes      |
-| `run_tests_cmd`                        | Command to run echidna tests                                                 | `echidna-test contracts/Contract.sol --contract Contract --config config.yaml \|\| true` | Yes      |
+| `run_tests_cmd`                        | Command to run echidna tests                                                 | `echidna-test contracts/Contract.sol --contract Contract --config config.yaml` | Yes      |
 | `REMOTE_ECHIDNA_S3_BUCKET`             | S3 Bucket name to store and load echidna's output between runs               | `remote-echidna-demo-bucket`                                                             | Yes      |
 | `REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME` | EC2 instance key name. Needs to be manually created first on the AWS console | `key.pem`                                                                                | Yes      |
 
