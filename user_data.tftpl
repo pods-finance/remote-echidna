@@ -75,11 +75,13 @@ aws s3 cp 3_RUNNING.yml s3://${s3_bucket}/${project_git_checkout}/latest/status/
 
 echo "[${namespace}][${project}][$(date)] Run tests"
 echo "[${namespace}][${project}][$(date)] '${run_tests_cmd}'"
-${run_tests_cmd}
+${run_tests_cmd} | tee logs.txt
 
 echo "[${namespace}][${project}][$(date)] Copy output to S3"
 aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/
 aws s3 cp /var/log/cloud-init-output.log s3://${s3_bucket}/${project_git_checkout}/latest/
+aws s3 cp logs.txt s3://${s3_bucket}/${project_git_checkout}/$INSTANCE_ID/
+aws s3 cp logs.txt s3://${s3_bucket}/${project_git_checkout}/latest/
 aws s3 sync $ECHIDNA_DIRECTORY/ s3://${s3_bucket}/${project_git_checkout}/output/
 
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
