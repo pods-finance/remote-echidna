@@ -31,6 +31,11 @@ jobs:
         id: pr_numbers
         working-directory: ./remote-echidna
         run: ./scripts/update-pr-comments.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
+      - name: Read logs.txt
+        id: logs
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./remote-echidna/logs.txt
       - name: Get date
         id: date
         run: |
@@ -49,5 +54,5 @@ jobs:
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED \n\n ${{ steps.pr_numbers.outputs.ECHIDNA_LOGS }}
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED \n\n ${{ steps.logs.outputs.content }}
           issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_4_FINISHED }}
