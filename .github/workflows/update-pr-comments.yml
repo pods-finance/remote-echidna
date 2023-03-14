@@ -35,7 +35,7 @@ jobs:
         id: date
         run: |
           DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          echo "DATE=${DATE}" >> $GITHUB_ENV
+          echo "DATE=${DATE}" >> $GITHUB_OUTPUT
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
