@@ -59,12 +59,24 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_wrapper: false
-      - name: Create tfvars file
+      - name: Provision
         working-directory: ./remote-echidna
-        id: tfvars
+        run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
+      - name: Check if this is the first run
+        id: is_first_run
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "vars.tfvars"
+      - name: Get PR number
+        id: pr_number
+        working-directory: ./remote-echidna
         run: |
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_OUTPUT
+      - name: Create tfvars file
+        if: steps.check_files.outputs.is_first_run == 'true'
+        working-directory: ./remote-echidna
+        run: |
           echo 'project = "${{ inputs.project }}"' >> vars.tfvars
           echo 'project_git_url = "${{ inputs.project_git_url }}"' >> vars.tfvars
           echo 'project_git_checkout = "${{ inputs.project_git_checkout }}"' >> vars.tfvars
@@ -73,10 +85,7 @@ jobs:
           echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> vars.tfvars
           [[ -v "${{ inputs.instance_type }}" ]] && echo 'instance_type = "${{ inputs.instance_type }}"' >> vars.tfvars || true
           [[ -v "${{ inputs.solidity_version }}" ]] && echo 'solidity_version = "${{ inputs.solidity_version }}"' >> vars.tfvars || true
-          [[ -v "$PR_NUMBER" ]] && echo 'pr_number = "$PR_NUMBER"' >> vars.tfvars || true
-      - name: Provision
-        working-directory: ./remote-echidna
-        run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
+          [[ -v "${{ steps.pr_number.outputs.PR_NUMBER }}" ]] && echo 'pr_number = "${{ steps.pr_number.outputs.PR_NUMBER }}"' >> vars.tfvars || true
       - name: Terraform validate
         working-directory: ./remote-echidna
         run: |
@@ -100,7 +109,7 @@ jobs:
       - name: Provisioned
         working-directory: ./remote-echidna
         run: |
-          ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }} ${{ steps.tfvars.outputs.PR_NUMBER }} 
+          ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }} ${{ steps.pr_number.outputs.PR_NUMBER }} 
       - run: echo "DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
       - uses: mshick/add-pr-comment@v2
         with:
