@@ -70,9 +70,9 @@ jobs:
           echo 's3_bucket = "${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}"' >> vars.tfvars
           echo 'ec2_instance_key_name = "${{ secrets.REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME }}"' >> vars.tfvars
           echo 'run_tests_cmd = "${{ inputs.run_tests_cmd }}"' >> vars.tfvars
-          [[ -v ${{ inputs.instance_type }} ]] && echo 'instance_type = "${{ inputs.instance_type }}"' >> vars.tfvars
-          [[ -v ${{ inputs.solidity_version }} ]] && echo 'solidity_version = "${{ inputs.solidity_version }}"' >> vars.tfvars
-          [[ -v $PR_NUMBER ]] && echo 'pr_number = "$PR_NUMBER"' >> vars.tfvars
+          [[ -v "${{ inputs.instance_type }}" ]] && echo 'instance_type = "${{ inputs.instance_type }}"' >> vars.tfvars
+          [[ -v "${{ inputs.solidity_version }}" ]] && echo 'solidity_version = "${{ inputs.solidity_version }}"' >> vars.tfvars
+          [[ -v "$PR_NUMBER" ]] && echo 'pr_number = "$PR_NUMBER"' >> vars.tfvars
       - name: Provision
         working-directory: ./remote-echidna
         run: ./scripts/provision.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }}
