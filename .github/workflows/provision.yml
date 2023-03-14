@@ -42,6 +42,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+      - name: Comment PR
+        uses: aviggiano/remote-echidna/.github/actions/comment_pr.yml
+        with:
+          body: "0_PROVISIONING"
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -80,7 +84,7 @@ jobs:
         working-directory: ./remote-echidna
         run: ./scripts/provisioned.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }} ${{ inputs.project_git_checkout }} ${{ steps.apply.outputs.EC2_INSTANCE_ID }}
       - name: Comment PR
-        uses: ./.github/actions/comment_pr.yml
+        uses: aviggiano/remote-echidna/.github/actions/comment_pr.yml
         with:
           body: "1_PROVISIONED ${{ steps.apply.outputs.EC2_INSTANCE_ID }}"
 
