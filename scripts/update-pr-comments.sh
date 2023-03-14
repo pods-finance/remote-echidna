@@ -4,7 +4,6 @@ set -ux
 
 S3_BUCKET="$1"
 
-for status in 2_STARTED 3_RUNNING 4_FINISHED; do
 function get_pr_number() {
   status=$1
   for instance_id_yml in $(aws s3 ls s3://$S3_BUCKET/$status/ | awk '{print $NF}'); do
