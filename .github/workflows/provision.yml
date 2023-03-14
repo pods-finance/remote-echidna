@@ -79,6 +79,7 @@ jobs:
         if: steps.is_first_run.outputs.files_exists != 'true'
         working-directory: ./remote-echidna
         run: |
+          echo ${{ steps.is_first_run.outputs.files_exists }}
           echo 'project = "${{ inputs.project }}"' >> vars.tfvars
           echo 'project_git_url = "${{ inputs.project_git_url }}"' >> vars.tfvars
           echo 'project_git_checkout = "${{ inputs.project_git_checkout }}"' >> vars.tfvars
