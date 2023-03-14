@@ -32,6 +32,9 @@ jobs:
   provision:
     name: Provision resources
     runs-on: ubuntu-latest
+    env:
+      URL: ${{ github.event.issue.comments_url }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - name: Clone remote-echidna
