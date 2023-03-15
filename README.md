@@ -28,7 +28,7 @@ This project creates the following infrastructure on AWS:
 
 ## Usage with GitHub Actions
 
-Create a GitHub Action on your CI that reuses remote-echidna's [workflow](./.github/workflows/remote-echidna.yml). See a [sample project](https://github.com/aviggiano/remote-echidna-demo) here
+Create a GitHub Action on your CI that reuses remote-echidna's [workflow](./.github/workflows/remote-echidna.yml). See a [sample project](https://github.com/pods-finance/yield-contracts) here
 
 ```
 name: Pull Request
@@ -40,12 +40,12 @@ on:
 jobs:
   remote-echidna:
     name: Run remote-echidna
-    uses: aviggiano/remote-echidna/.github/workflows/remote-echidna.yml@v2
+    uses: pods-finance/remote-echidna/.github/workflows/remote-echidna.yml@v2
     with:
-      project: "remote-echidna-demo"
+      project: "https://github.com/${{github.repository}}.git"
       project_git_url: "https://github.com/${{github.repository}}.git"
       project_git_checkout: ${{ github.head_ref || github.ref_name }}
-      run_tests_cmd: "echidna-test contracts/Contract.sol --contract Contract --config config.yaml"
+      run_tests_cmd: "yarn && echidna-test test/invariants/STETHVaultInvariants.sol --contract STETHVaultInvariants --config test/invariants/config-assertion.yaml --test-limit 100000"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -69,7 +69,7 @@ jobs:
     name: Update PR comments
     permissions:
       pull-requests: write
-    uses: aviggiano/remote-echidna/.github/workflows/update-pr-comments.yml@v2
+    uses: pods-finance/remote-echidna/.github/workflows/update-pr-comments.yml@v2
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -83,12 +83,12 @@ jobs:
 
 | Parameter                              | Description                                                                  | Example                                                                                  | Required |
 | -------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------- |
-| `project`                              | Your project name                                                            | `remote-echidna-demo`                                                                    | Yes      |
-| `project_git_url`                      | Project Git URL                                                              | `https://github.com/aviggiano/remote-echidna-demo.git`                                   | Yes      |
-| `project_git_checkout`                 | Project Git checkout (branch or commit hash)                                 | `main`                                                                                   | Yes      |
-| `run_tests_cmd`                        | Command to run echidna tests                                                 | `echidna-test contracts/Contract.sol --contract Contract --config config.yaml` | Yes      |
-| `REMOTE_ECHIDNA_S3_BUCKET`             | S3 Bucket name to store and load echidna's output between runs               | `remote-echidna-demo-bucket`                                                             | Yes      |
-| `REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME` | EC2 instance key name. Needs to be manually created first on the AWS console | `key.pem`                                                                                | Yes      |
+| `project`                              | Your project name                                                            | `yield-contracts`                                                                    | Yes      |
+| `project_git_url`                      | Project Git URL                                                              | `https://github.com/${{github.repository}}.git`                                   | Yes      |
+| `project_git_checkout`                 | Project Git checkout (branch or commit hash)                                 | `${{ github.head_ref \|\| github.ref_name }}`                                                                                   | Yes      |
+| `run_tests_cmd`                        | Command to run echidna tests                                                 | `yarn && echidna-test test/invariants/STETHVaultInvariants.sol --contract STETHVaultInvariants --config test/invariants/config-assertion.yaml --test-limit 100000` | Yes      |
+| `REMOTE_ECHIDNA_S3_BUCKET`             | S3 Bucket name to store and load echidna's output between runs               | `remote-echidna`                                                             | Yes      |
+| `REMOTE_ECHIDNA_EC2_INSTANCE_KEY_NAME` | EC2 instance key name. Needs to be manually created first on the AWS console | `key`                                                                                | Yes      |
 
 ## Output
 
@@ -103,13 +103,4 @@ The job status is stored on a S3 bucket, alongside echidna's output:
 
 Some of these states are managed from within the instance (2 -> 3 -> 4), while others are managed through Github actions (0 -> 1 -> 2, 4 -> 5).
 
-In order to visualize echidna's output, the easiest way is to download the logs from S3:
-
-```
-aws s3 cp s3://$REMOTE_ECHIDNA_S3_BUCKET/${project_git_checkout}/latest/cloud-init-output.log .
-```
-
-## Next steps
-
-- [ ] Create a better way to monitor echidna ETA (depends on [crytic/echidna#975](https://github.com/crytic/echidna/issues/975))
-- [ ] Create AMI with all required software instead of [installing everything](./terraform/user_data.tftpl) at each time (would speed up about 1min)
+Echidna's output will be automatically included on your pull request with as a GitHub bot comment.
