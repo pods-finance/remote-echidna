@@ -48,11 +48,13 @@ jobs:
           DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           echo "DATE=${DATE}" >> $GITHUB_OUTPUT
       - uses: mshick/add-pr-comment@v2
+        if: steps.pr_numbers.outputs.INSTANCE_ID_2_STARTED != ''
         with:
           message: |
             **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 2_STARTED (${{ steps.pr_numbers.outputs.INSTANCE_ID_2_STARTED }})
           issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_2_STARTED }}
       - uses: mshick/add-pr-comment@v2
+        if: steps.pr_numbers.outputs.INSTANCE_ID_3_RUNNING != ''
         with:
           message: |
             **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 3_RUNNING (${{ steps.pr_numbers.outputs.INSTANCE_ID_3_RUNNING }})
