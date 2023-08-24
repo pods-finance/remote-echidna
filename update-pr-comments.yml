@@ -1,0 +1,67 @@
+name: Update PR comments
+
+on:
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_REGION:
+        required: true
+      REMOTE_ECHIDNA_S3_BUCKET:
+        required: true
+
+jobs:
+  update_pr_comments:
+    name: Update PR comments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Clone remote-echidna
+        run: git submodule add https://github.com/aviggiano/remote-echidna.git
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Get PR numbers
+        id: pr_numbers
+        working-directory: ./remote-echidna
+        run: ./scripts/update-pr-comments.sh ${{ secrets.REMOTE_ECHIDNA_S3_BUCKET }}
+      - name: Check if logs.txt exists
+        id: logs_exists
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "./remote-echidna/logs.txt"
+      - name: Read logs.txt
+        if: steps.logs_exists.outputs.files_exists == 'true'
+        id: logs
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./remote-echidna/logs.txt
+      - name: Get date
+        id: date
+        run: |
+          DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo "DATE=${DATE}" >> $GITHUB_OUTPUT
+      - uses: mshick/add-pr-comment@v2
+        if: steps.pr_numbers.outputs.INSTANCE_ID_2_STARTED != ''
+        with:
+          message: |
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 2_STARTED (${{ steps.pr_numbers.outputs.INSTANCE_ID_2_STARTED }})
+          issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_2_STARTED }}
+      - uses: mshick/add-pr-comment@v2
+        if: steps.pr_numbers.outputs.INSTANCE_ID_3_RUNNING != ''
+        with:
+          message: |
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 3_RUNNING (${{ steps.pr_numbers.outputs.INSTANCE_ID_3_RUNNING }})
+          issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_3_RUNNING }}
+      - uses: mshick/add-pr-comment@v2
+        if: steps.logs_exists.outputs.files_exists == 'true'
+        with:
+          message: |
+            **[☁️🦔][remote-echidna][${{ steps.date.outputs.DATE }}]** 4_FINISHED (${{ steps.pr_numbers.outputs.INSTANCE_ID_4_FINISHED }})<br/><br/><pre><code>${{ steps.logs.outputs.content }}</code></pre>
+          issue: ${{ steps.pr_numbers.outputs.PR_NUMBER_4_FINISHED }}
